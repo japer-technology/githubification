@@ -1,6 +1,6 @@
 # GitHubification
 
-### The method by which most repo can executed using GitHub as Infrastructure
+### The method by which most repo can execute using GitHub as Infrastructure
 
 <p align="center">
   <picture>
