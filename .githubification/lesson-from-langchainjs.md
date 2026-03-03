@@ -186,7 +186,7 @@ The most distinctive pattern in `github-langchainjs` is the contrast with AutoGP
 | Dimension | AutoGPT (Platform) | LangChain.js (Framework) |
 |---|---|---|
 | **Runtime dependencies** | PostgreSQL, Redis, RabbitMQ, Supabase, ClamAV, Docker Compose | Node.js (or Deno or Bun) |
-| **To run unit tests** | Poetry, Docker, PostgreSQL, Prisma | `pnpm install && pnpm test` |
+| **To run unit tests** | Poetry, Docker, PostgreSQL (with Prisma for schema generation) | `pnpm install && pnpm test` |
 | **To build** | Docker Compose, multiple services | `pnpm build` |
 | **GitHub Actions compatible** | No — persistent services required | Yes — everything runs on a standard runner |
 | **Githubification strategy** | Substitution (lightweight agent reads codebase as context) | Native (framework code executes directly on Actions) |
