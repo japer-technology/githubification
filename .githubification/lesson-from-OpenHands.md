@@ -269,7 +269,7 @@ This means the repository has two distinct Githubification loops: **issue resolu
 
 ### 8. Comprehensive AGENTS.md as Operational Context
 
-The `AGENTS.md` in `github-OpenHands` is not just documentation — it is an **operational manual for AI coding agents**. At approximately 9KB, it covers:
+The `AGENTS.md` in `github-OpenHands` is not just documentation — it is an **operational manual for AI coding agents**. It covers:
 
 - Repository structure (backend, frontend, VS Code extension, enterprise)
 - Build commands (`make build`, `poetry install`, `npm install`)
