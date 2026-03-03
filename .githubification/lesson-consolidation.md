@@ -116,7 +116,7 @@ MicroClaw's channel-agnostic architecture (Telegram, Discord, Slack, Feishu, Web
 | **Githubification folder** | Design documents + minimal adapter code |
 | **Lifecycle complexity** | Workflow → binary → response |
 | **Runtime dependencies** | 0 (compiled Rust binary) |
-| **New code required** | ~500 lines (channel adapter + CLI subcommand) |
+| **New code required** | ~500 lines estimated (channel adapter + CLI subcommand) |
 
 **When to use:** The agent already has a platform adapter architecture. If there's a clean separation between "how it receives input" and "how it processes it," Githubification becomes an adapter problem, not a rewrite.
 
