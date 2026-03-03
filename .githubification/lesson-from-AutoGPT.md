@@ -154,8 +154,8 @@ The repository is configured for multiple AI coding agents simultaneously:
 | Agent | Configuration |
 |---|---|
 | **GitHub Copilot** | `.github/copilot-instructions.md` — 12KB structured instructions |
-| **Claude Code** | `CLAUDE.md` files (root `AGENTS.md` + `autogpt_platform/CLAUDE.md` + `docs/CLAUDE.md`), `.claude/skills/` |
-| **Codex** | `AGENTS.md` at the root with conventional commit rules and testing commands |
+| **Claude Code** | `autogpt_platform/CLAUDE.md` + `docs/CLAUDE.md` for subfolder context, `.claude/skills/` for persistent knowledge |
+| **Codex** | Root `AGENTS.md` with directory overview, conventional commit rules, and testing commands |
 | **PR Agent** | `.pr_agent.toml` for automated pull request review |
 | **DeepSource** | `.deepsource.toml` for static analysis |
 | **Dependabot** | `.github/dependabot.yml` for automated dependency updates |
