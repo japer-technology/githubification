@@ -6,7 +6,7 @@
 
 ## The Subject
 
-[Pi Mono](https://github.com/badlogic/pi-mono) is an open-source monorepo containing the tools for building AI agents and managing LLM deployments. Its central package — `@mariozechner/pi-coding-agent` — is an interactive coding agent CLI that handles LLM communication, tool execution (read, edit, bash, grep), session management, multi-provider support, and terminal UI rendering. Around this core sit six supporting packages: a unified multi-provider LLM API (`pi-ai`), an agent runtime with tool calling and state management (`pi-agent-core`), a Slack bot that delegates messages to the coding agent (`pi-mom`), a terminal UI library with differential rendering (`pi-tui`), web components for AI chat interfaces (`pi-web-ui`), and a CLI for managing vLLM deployments on GPU pods (`pi-pods`).
+[Pi Mono](https://github.com/japer-technology/github-pi-mono) is an open-source monorepo containing the tools for building AI agents and managing LLM deployments. Its central package — `@mariozechner/pi-coding-agent` — is an interactive coding agent CLI that handles LLM communication, tool execution (read, edit, bash, grep), session management, multi-provider support, and terminal UI rendering. Around this core sit six supporting packages: a unified multi-provider LLM API (`pi-ai`), an agent runtime with tool calling and state management (`pi-agent-core`), a Slack bot that delegates messages to the coding agent (`pi-mom`), a terminal UI library with differential rendering (`pi-tui`), web components for AI chat interfaces (`pi-web-ui`), and a CLI for managing vLLM deployments on GPU pods (`pi-pods`).
 
 `japer-technology/github-pi-mono` is this repository as it exists today — **not yet Githubified**. There is no issue-triggered workflow, no conversational agent running on GitHub Actions, no Githubification folder. The repository uses GitHub for standard development infrastructure: continuous integration (build → check → test), a contributor gating system (PR Gate + Approve Contributor workflows), tag-triggered binary builds, structured issue templates, and pre-commit hooks. GitHub Actions compiles the TypeScript packages, runs the test suite, and produces cross-platform binaries via Bun — but the coding agent itself does not execute on GitHub in response to issues.
 
@@ -201,7 +201,7 @@ The `build-binaries.yml` workflow pins its GitHub Actions to full commit SHAs:
 
 ```yaml
 - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-- uses: oven-sh/setup-bun@4bc047ad259df6fc24a6c9b0f9a0cb08cf17fbe5  # v2.0.1
+- uses: oven-sh/setup-bun@4bc047ad259df6fc24a6c9b0f9a0cb08cf17fbe5 # v2.0.1
 - uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
 ```
 
