@@ -8,7 +8,7 @@
   </picture>
 </p>
 
-Githubification is the process of turning a GitHub repository into a **GitHub-as-infrastructure** mechanism. Rather than cloning and installing the software that lives in a repo, Githubification gives the repo the ability to **execute directly on GitHub** using GitHub Actions. The software no longer needs a local runtime—GitHub _is_ the runtime.
+Githubification is the act of converting a repository into GitHub-as-infrastructure. Instead of cloning the repo and running the software elsewhere, the repo becomes something that runs on GitHub itself via GitHub Actions. There’s no separate local runtime to install—GitHub is the runtime.
 
 ---
 
