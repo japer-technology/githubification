@@ -2,6 +2,12 @@
 
 ### The method by which any repo can execute using GitHub as Infrastructure
 
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japer-technology/githubification/main/.githubification/githubification-logo.png" alt="GitHubification" width="500">
+  </picture>
+</p>
+
 Githubification is the process of turning a GitHub repository into a **GitHub-as-infrastructure** mechanism. Rather than cloning and installing the software that lives in a repo, Githubification gives the repo the ability to **execute directly on GitHub** using GitHub Actions. The software no longer needs a local runtime—GitHub _is_ the runtime.
 
 ---
