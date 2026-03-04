@@ -19,7 +19,7 @@ v3 resolves contradictions between v1-style minimalism and v2-style redesign by 
 
 ## 1) Deep Analysis — What v1 and v2 got right/wrong
 
-## 1.1 Core conflict map
+### 1.1 Core conflict map
 
 | Topic | `nanoclaw.md` | `nanoclaw-v2.md` | v3 decision |
 |---|---|---|---|
@@ -30,7 +30,7 @@ v3 resolves contradictions between v1-style minimalism and v2-style redesign by 
 | Strategy claim | Channel addition + one-shot | Channel addition but with larger rewrites | **True channel-addition with minimal invasive one-shot mode** |
 | Risk profile | Low-medium change | Medium-high redesign | **Low-medium for v3.0; high-risk ideas moved to later phases** |
 
-## 1.2 Architectural truths from source code
+### 1.2 Architectural truths from source code
 
 1. NanoClaw is already strongly modular where it matters for Githubification:
    - channel abstraction (`src/channels/registry.ts`)
@@ -42,7 +42,7 @@ v3 resolves contradictions between v1-style minimalism and v2-style redesign by 
 3. Rewriting persistence from SQLite to JSON at the same time as runtime migration is unnecessary risk.
 4. Security posture in NanoClaw is built around container isolation + mount policy; dropping that at v3.0 reduces parity with the source system.
 
-## 1.3 v3 principle
+### 1.3 v3 principle
 
 > **Preserve NanoClaw’s proven internals; adapt only ingress/egress and lifecycle to GitHub’s event model.**
 
@@ -50,13 +50,13 @@ v3 resolves contradictions between v1-style minimalism and v2-style redesign by 
 
 ## 2) Strategy and scope
 
-## 2.1 Primary strategy
+### 2.1 Primary strategy
 
 **Strategy 5 (Channel Addition) + one-shot GitHub execution mode**.
 
 GitHub Issues become a first-class NanoClaw channel surface. The agent run model is one-shot per event, not a persistent daemon.
 
-## 2.2 v3.0 in scope
+### 2.2 v3.0 in scope
 
 1. Issue/comment-triggered execution.
 2. Per-issue session continuity.
@@ -66,7 +66,7 @@ GitHub Issues become a first-class NanoClaw channel surface. The agent run model
 6. Fail-closed authorization + sentinel controls.
 7. Per-issue concurrency and resilient push retry.
 
-## 2.3 v3.0 out of scope
+### 2.3 v3.0 out of scope
 
 1. Production scheduler parity (`schedule_task`) as part of same workflow.
 2. Full multi-channel runtime activation on Actions.
@@ -89,7 +89,7 @@ GitHub Issues become a first-class NanoClaw channel surface. The agent run model
 
 ## 4) Target architecture
 
-## 4.1 Primitive mapping
+### 4.1 Primitive mapping
 
 | GitHub Primitive | NanoClaw v3 mapping |
 |---|---|
@@ -98,19 +98,21 @@ GitHub Issues become a first-class NanoClaw channel surface. The agent run model
 | **Issues** | Conversation UI (one issue = one thread/group) |
 | **Secrets** | Credential source for Claude and GitHub API |
 
-## 4.2 Execution pipeline
+### 4.2 Execution pipeline
 
 ```
 Issue open/comment event
   -> Auth + guard checks
+  -> Indicator start (🚀)
   -> Build NanoClaw message context for issue N
   -> One-shot agent execution (containerized)
   -> Post response comment
-  -> Persist + export state
+  -> Export readable state
   -> Commit/push with retry
+  -> Indicator end (👍 success / 👎 failure)
 ```
 
-## 4.3 Group identity mapping
+### 4.3 Group identity mapping
 
 - `chat_jid`: `gh:<owner>/<repo>#<issue_number>`
 - `group.folder`: `github-issue-<issue_number>`
@@ -121,7 +123,7 @@ Issue open/comment event
 
 ## 5) File and folder specification
 
-## 5.1 Githubified product folder
+### 5.1 Githubified product folder
 
 ```
 .github-nanoclaw/
@@ -156,11 +158,14 @@ Issue open/comment event
 └── tests/
     ├── mapping.test.ts
     ├── auth-guard.test.ts
+    ├── isolation.test.ts
     ├── state-export.test.ts
-    └── workflow-structure.test.ts
+    ├── commit-retry.test.ts
+    ├── workflow-structure.test.ts
+    └── config-overrides.test.ts
 ```
 
-## 5.2 Host repo touch points (only)
+### 5.2 Host repo touch points (only)
 
 Installer may create/update:
 
@@ -173,7 +178,7 @@ No other host-level mutation required.
 
 ## 6) Code-level changes required in `github-nanoclaw`
 
-## 6.1 Add GitHub one-shot orchestrator
+### 6.1 Add GitHub one-shot orchestrator
 
 Create `src/github-agent.ts` (or `src/modes/github.ts`) that:
 
@@ -182,9 +187,9 @@ Create `src/github-agent.ts` (or `src/modes/github.ts`) that:
 3. normalizes inbound message(s) to `NewMessage`
 4. initializes DB and registered issue-group if absent
 5. executes a single run via `runContainerAgent`
-6. returns collected outbound messages for posting to issue
+6. collects outbound messages for the lifecycle layer to post via the outbound adapter (section 6.4)
 
-## 6.2 Add path overrides in config
+### 6.2 Add path overrides in config
 
 `src/config.ts` must support env overrides:
 
@@ -194,7 +199,7 @@ Create `src/github-agent.ts` (or `src/modes/github.ts`) that:
 
 GitHub workflow sets these to `.github-nanoclaw/state/{store,groups,data}`.
 
-## 6.3 Add GitHub mode flags
+### 6.3 Add GitHub mode flags
 
 Introduce runtime flags:
 
@@ -202,7 +207,7 @@ Introduce runtime flags:
 - `NANOCLAW_ENABLE_SCHEDULER=0` (default in issue workflow)
 - `NANOCLAW_ENABLE_CHANNEL_BOOT=0` (skip normal channel connect loop)
 
-## 6.4 Add GitHub outbound adapter
+### 6.4 Add GitHub outbound adapter
 
 Provide posting adapter (either via tiny GitHub channel or lifecycle helper):
 
@@ -210,7 +215,7 @@ Provide posting adapter (either via tiny GitHub channel or lifecycle helper):
 - add/remove status reactions
 - strip `<internal>...</internal>` from outbound text
 
-## 6.5 Keep container boundary for v3.0
+### 6.5 Keep container boundary for v3.0
 
 `runContainerAgent` remains primary execution path in Actions.
 
@@ -223,7 +228,7 @@ GitHub mode sets:
 
 ## 7) Workflow specification
 
-## 7.1 Triggers
+### 7.1 Triggers
 
 ```yaml
 on:
@@ -235,7 +240,7 @@ on:
 
 (`edited` is excluded in v3.0 to avoid replay/duplicate semantics; optional later.)
 
-## 7.2 Concurrency
+### 7.2 Concurrency
 
 ```yaml
 concurrency:
@@ -243,17 +248,18 @@ concurrency:
   cancel-in-progress: false
 ```
 
-## 7.3 Required pipeline
+### 7.3 Required pipeline
 
 1. **Authorize** actor permission (`admin|maintain|write`)
 2. **Guard** sentinel file exists
 3. **Indicator start** (🚀)
 4. **Run one-shot agent**
-5. **Export readable state**
-6. **Commit and push with retry**
-7. **Indicator end** (👍 success / 👎 failure)
+5. **Post response comment**
+6. **Export readable state**
+7. **Commit and push with retry**
+8. **Indicator end** (👍 success / 👎 failure)
 
-## 7.4 Push retry policy
+### 7.4 Push retry policy
 
 - max 10 attempts
 - backoff escalation (1s → 3s → 5s ...)
@@ -264,7 +270,7 @@ concurrency:
 
 ## 8) State model
 
-## 8.1 Canonical persistence
+### 8.1 Canonical persistence
 
 SQLite remains canonical in v3.0:
 
@@ -272,7 +278,7 @@ SQLite remains canonical in v3.0:
 
 This preserves compatibility with existing NanoClaw code and minimizes migration risk.
 
-## 8.2 Required readable mirrors
+### 8.2 Required readable mirrors
 
 After each run, export:
 
@@ -281,7 +287,7 @@ After each run, export:
 3. latest run metadata (`state/readable/latest-run.json`)
 4. issue mapping (`state/issues/<n>.json`)
 
-## 8.3 Canonical mapping object
+### 8.3 Canonical mapping object
 
 `state/issues/<n>.json`:
 
@@ -300,7 +306,7 @@ After each run, export:
 
 ## 9) Security model
 
-## 9.1 Fail-closed gates
+### 9.1 Fail-closed gates
 
 All must pass before execution:
 
@@ -309,13 +315,13 @@ All must pass before execution:
 3. event type validation
 4. bot-loop prevention
 
-## 9.2 Credential handling
+### 9.2 Credential handling
 
 - only required env vars injected
 - no secrets written into committed files
 - reuse NanoClaw filtering model for allowed auth variables
 
-## 9.3 Isolation model
+### 9.3 Isolation model
 
 v3.0 uses layered isolation:
 
@@ -323,7 +329,7 @@ v3.0 uses layered isolation:
 2. NanoClaw container execution boundary
 3. mount restrictions + blocked patterns
 
-## 9.4 Loop prevention
+### 9.4 Loop prevention
 
 Ignore event when:
 
@@ -335,13 +341,13 @@ Ignore event when:
 
 ## 10) UX and behavior
 
-## 10.1 Reactions
+### 10.1 Reactions
 
 - 🚀 when processing starts
 - 👍 when complete
 - 👎 on auth failure or runtime error
 
-## 10.2 Response policy
+### 10.2 Response policy
 
 v3.0 default:
 
@@ -349,7 +355,7 @@ v3.0 default:
 - no internal reasoning tags
 - include brief failure reason when no model output
 
-## 10.3 Trigger semantics
+### 10.3 Trigger semantics
 
 In GitHub mode, comment creation is itself the trigger; explicit `@Assistant` prefix is not required.
 
@@ -374,7 +380,7 @@ Uninstall requirements:
 
 ## 12) Testing specification
 
-## 12.1 Unit/structural tests (required)
+### 12.1 Unit/structural tests (required)
 
 1. event→issue mapping correctness
 2. issue isolation guarantees
@@ -384,14 +390,14 @@ Uninstall requirements:
 6. workflow schema/structure checks
 7. config path override correctness
 
-## 12.2 Integration tests (required before release)
+### 12.2 Integration tests (required before release)
 
 1. simulate `issues.opened`
 2. simulate `issue_comment.created`
 3. verify resume on second comment same issue
 4. verify no leakage between issue A and issue B
 
-## 12.3 Non-goal tests
+### 12.3 Non-goal tests
 
 - do not assert exact LLM wording
 
@@ -399,14 +405,14 @@ Uninstall requirements:
 
 ## 13) Phased implementation plan
 
-## Phase 0 — Foundations
+### Phase 0 — Foundations
 
 - add config path overrides
 - add GitHub mode flags
 - add one-shot orchestrator skeleton
 - add minimal workflow + auth + sentinel
 
-## Phase 1 — Functional core (v3.0)
+### Phase 1 — Functional core (v3.0)
 
 - issue/comment execution path
 - containerized one-shot run
@@ -414,14 +420,14 @@ Uninstall requirements:
 - state commit + retry
 - readable export generation
 
-## Phase 2 — Hardening
+### Phase 2 — Hardening
 
 - richer error taxonomy + operator diagnostics
 - stricter loop detection
 - improved audit exports
 - expanded integration fixtures
 
-## Phase 3 — Optional enhancements
+### Phase 3 — Optional enhancements
 
 - runner-direct execution mode (opt-in)
 - `issue_comment.edited` handling semantics
